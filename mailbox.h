@@ -2,5 +2,5 @@
 #define MAILBOX_H
 void produce();
 
-void consume();
+void consume(int n);
 #endif

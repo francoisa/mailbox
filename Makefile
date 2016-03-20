@@ -5,7 +5,7 @@ CXX =g++
 CC =g++
 DEBUG =-g
 GTEST =../googletest/
-CXXFLAGS = -Wall -std=gnu++0x -I. -I$(GTEST)/include $(DEBUG)
+CXXFLAGS = -Wall -std=gnu++0x -I. $(DEBUG)
 TESTLIBS = -L$(GTEST) -lgtest
 
 $(TGT): $(OBJS)

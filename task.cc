@@ -1,19 +1,20 @@
 #include <random>
+#include <chrono>
 #include "task.h"
 
 using namespace std;
 using namespace std::chrono;
 
 static int get_rand() {
-    static random_seed r;
+    static random_device r;
 
     static default_random_engine el(r());
     static uniform_int_distribution<int> uniform_dist(6, 26);
 
-    return uniform_dist(e2);
+    return uniform_dist(el);
 }
 
-long long PrimeGenerator::do_work() {
+long long PrimeNumberGenerator::do_work() {
     long long prime = 2;
     int count = 0;
     while (count < number) {
@@ -35,20 +36,20 @@ long long PrimeGenerator::do_work() {
     return prime;
 }
 
-bool PrimeGenerator::is_done() {
+bool PrimeNumberGenerator::is_done() const {
     return done;
 }
 
 bool ThereAreMoreTasks() {
     static auto start = high_resolution_clock::now();
     auto now = high_resolution_clock::now();
-    return ()30 < duration_cast<seconds>(now-start).count());
+    return (30 < duration_cast<seconds>(now-start).count());
 }
 
-unique_ptr<PrimeGenerator> AllocateAndBuildNewTask() {
-    return unique_ptr<PrimeGenerator>(new PrimeGenerator(get_rand()));
+shared_ptr<PrimeNumberGenerator> AllocateAndBuildNewTask() {
+    return make_shared<PrimeNumberGenerator>(PrimeNumberGenerator(get_rand()));
 }
 
-void DoWork(unique_ptr<PrimeGenerator>& pg) {
+void DoWork(shared_ptr<PrimeNumberGenerator>& pg) {
     pg->do_work();
 }

@@ -8,9 +8,9 @@ using namespace std;
 
 constexpr int K = 2;
 vector<semaphore> sem(K);
-vector<unique_ptr<PrimeNumberGenerator> > slot(K);
+vector<shared_ptr<PrimeNumberGenerator> > slot(K);
 
-static unique_ptr<PrimeNumberGenerator> done;
+static shared_ptr<PrimeNumberGenerator> done;
 
 void produce() {
     auto curr = 0;
@@ -35,7 +35,7 @@ void produce() {
 
 
 void consume(int mySlot) {
-    unique_ptr<PrimeNumberGenerator> myTask = nullptr;
+    shared_ptr<PrimeNumberGenerator> myTask = nullptr;
     while (myTask != done) {
         while ((myTask = slot[mySlot]) == nullptr)
             sem[mySlot].wait();

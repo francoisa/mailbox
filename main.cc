@@ -32,8 +32,9 @@ private:
 
 int main(int argc, char* argv[]) {
     // create a consumer
-    ThreadRAII c(thread(consume), ThreadRAII::DtorAction::join);
+    ThreadRAII c(thread(consume, 0), ThreadRAII::DtorAction::join);
     // create a producer
-    ThreadRAII c(thread(produce), ThreadRAII::DtorAction::detach);
+    ThreadRAII p(thread(produce), ThreadRAII::DtorAction::detach);
+    c.get().join();
     return 0;
 }
