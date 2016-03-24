@@ -8,8 +8,9 @@ class PrimeNumberGenerator {
 
     bool is_done() const;
     long long do_work();
+    inline int n() const { return number; }
   private:
-    int number;
+    const int number;
     bool done;
 };
 
@@ -17,5 +18,5 @@ bool ThereAreMoreTasks();
 
 std::shared_ptr<PrimeNumberGenerator> AllocateAndBuildNewTask();
 
-void DoWork(std::shared_ptr<PrimeNumberGenerator>& pg);
+long long  DoWork(std::shared_ptr<PrimeNumberGenerator>& pg);
 #endif

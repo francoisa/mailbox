@@ -4,30 +4,28 @@
 using namespace std;
 
 class ThreadRAII {
-public:
-  enum class DtorAction { join, detach };    // see Item 10 for
-                                             // enum class info
+  public:
+    enum class DtorAction { join, detach };
 
-  ThreadRAII(std::thread&& t, DtorAction a)  // in dtor, take
-  : action(a), t(std::move(t)) {}            // action a on t
+    ThreadRAII(thread&& t, DtorAction a)  // in dtor, take action a on t
+    : action(a), thrd(std::move(t)) {}
 
-  ~ThreadRAII()
-  {                                          // see below for
-    if (t.joinable()) {                      // joinability test
-      if (action == DtorAction::join) {
-        t.join();
-      } else {
-        t.detach();
-      }
-
+    ~ThreadRAII() {
+        if (thrd.joinable()) {
+            if (action == DtorAction::join) {
+                thrd.join();
+            }
+            else {
+                thrd.detach();
+            }
+        }
     }
-  }
 
-  std::thread& get() { return t; }           // see below
+    inline thread& get() { return thrd; }
 
-private:
-  DtorAction action;
-  std::thread t;
+  private:
+    DtorAction action;
+    thread thrd;
 };
 
 int main(int argc, char* argv[]) {
@@ -36,5 +34,6 @@ int main(int argc, char* argv[]) {
     // create a producer
     ThreadRAII p(thread(produce), ThreadRAII::DtorAction::detach);
     c.get().join();
+
     return 0;
 }

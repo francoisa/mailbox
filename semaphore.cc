@@ -8,7 +8,7 @@ void semaphore::notify() {
 
 void semaphore::wait() {
     unique_lock<mutex> lck(mtx);
-    while(count == 0) {
+    while (count == 0) {
         cv.wait(lck);
     }
     --count;
