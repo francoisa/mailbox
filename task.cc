@@ -10,7 +10,7 @@ static int get_rand() {
     static random_device r;
 
     static default_random_engine el(r());
-    static uniform_int_distribution<int> uniform_dist(6, 26);
+    static uniform_int_distribution<int> uniform_dist(6, 10000);
 
     return uniform_dist(el);
 }
@@ -65,16 +65,17 @@ bool operator!=(const PrimeNumberGenerator& lhs,
 }
 
 bool ThereAreMoreTasks() {
-    static auto start = high_resolution_clock::now();
-    auto now = high_resolution_clock::now();
-    cout << "duration: " << duration_cast<seconds>(now-start).count() << endl;
-    return (1 > duration_cast<seconds>(now-start).count());
+    static auto count = 0;
+    count++;
+    return (count < 100);
 }
 
-shared_ptr<PrimeNumberGenerator> AllocateAndBuildNewTask() {
-    return make_shared<PrimeNumberGenerator>(PrimeNumberGenerator(get_rand()));
+PrimeNumberGenerator* AllocateAndBuildNewTask() {
+    return new PrimeNumberGenerator(get_rand());
 }
 
-long long DoWork(shared_ptr<PrimeNumberGenerator>& pg) {
-    return pg->do_work();
+long long DoWork(PrimeNumberGenerator* pg) {
+    auto result = pg->do_work();
+    delete pg;
+    return result;
 }

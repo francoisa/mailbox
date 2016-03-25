@@ -16,7 +16,7 @@ class PrimeNumberGenerator {
 
 bool ThereAreMoreTasks();
 
-std::shared_ptr<PrimeNumberGenerator> AllocateAndBuildNewTask();
+PrimeNumberGenerator* AllocateAndBuildNewTask();
 
-long long  DoWork(std::shared_ptr<PrimeNumberGenerator>& pg);
+long long  DoWork(PrimeNumberGenerator* png);
 #endif

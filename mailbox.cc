@@ -2,6 +2,7 @@
 #include <thread>
 #include <iostream>
 #include <memory>
+#include <atomic>
 #include "semaphore.h"
 #include "mailbox.h"
 #include "task.h"
@@ -10,21 +11,24 @@ using namespace std;
 
 constexpr int K = 2;
 vector<semaphore> sem(K);
-vector<shared_ptr<PrimeNumberGenerator> > slot(K);
+atomic<PrimeNumberGenerator*> slot[K];
 
-static auto done = make_shared<PrimeNumberGenerator>(0);
+static PrimeNumberGenerator DONE(0);
+PrimeNumberGenerator* done(&DONE);
 
 void produce() {
     auto curr = 0;
+    auto count = 0;
     // Phase 1: build and distribute tasks
     while (ThereAreMoreTasks()) {
         auto task = AllocateAndBuildNewTask();
         while (slot[curr] != nullptr)
             curr = (curr+1)%K;
         slot[curr] = task;
+        count++;
         sem[curr].notify();
     }
-    cout << "Done producing" << endl;
+    cout << "Done producing " << count << " tasks." << endl;
     // Phase 2: Stuff the mailbox with done
     auto numNotified = 0;
     while (numNotified < K) {
@@ -40,11 +44,11 @@ void produce() {
 thread_local vector<long long> primes;
 
 void consume(int mySlot) {
-    shared_ptr<PrimeNumberGenerator> myTask = nullptr;
-    while (myTask.get() != done.get()) {
+    PrimeNumberGenerator* myTask = nullptr;
+    while (myTask != done) {
         while ((myTask = slot[mySlot]) == nullptr)
             sem[mySlot].wait();
-        if (myTask.get() != done.get()) {
+        if (myTask != done) {
             slot[mySlot] = nullptr;
             primes.push_back(DoWork(myTask));
         }
